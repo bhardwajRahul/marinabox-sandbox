@@ -55,6 +55,6 @@ COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Expose VNC, noVNC, and API ports
-EXPOSE 5900 6081 8000
+EXPOSE 5900 6081 8000 2000
 
 CMD ["/start.sh"]
