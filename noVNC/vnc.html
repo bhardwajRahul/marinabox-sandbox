@@ -57,6 +57,11 @@
         #noVNC_control_bar_anchor {
             display: none !important;
         }
+        
+        /* Enhance perceived brightness/contrast/saturation of the remote canvas */
+        #noVNC_container canvas {
+            filter: brightness(1.15) contrast(1.08) saturate(1.12);
+        }
     </style>
 </head>
 
