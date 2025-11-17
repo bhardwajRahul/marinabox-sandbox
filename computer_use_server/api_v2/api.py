@@ -24,12 +24,27 @@ async def get_screenshot():
 
         screenshot_path = "/tmp/screenshot.png"
         cmd = [
-            "ffmpeg", "-f", "x11grab", "-video_size", video_size,
-            "-i", f":{DISPLAY_NUM}", "-frames:v", "1", "-y", screenshot_path
+        "ffmpeg",
+        "-hide_banner", "-loglevel", "info",
+        "-f", "x11grab", "-video_size", video_size,
+        "-i", f":{DISPLAY_NUM}",
+        "-frames:v", "1",
+        "-update", "1",
+        "-y", screenshot_path,
         ]
 
+        result = subprocess.run(
+            cmd,
+            check=True,
+            env=DISPLAY_ENV,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
-        subprocess.run(cmd, check=True, env=DISPLAY_ENV)
+        logger.debug(f"Screenshot command output: {result.stdout}")
+        logger.debug(f"Screenshot command stderr: {result.stderr}")
+
 
         with open(screenshot_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
