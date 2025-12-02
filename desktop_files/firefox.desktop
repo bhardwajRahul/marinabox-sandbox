@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Name=Firefox
+GenericName=Web Browser
+Comment=Browse the World Wide Web
+Exec=/usr/bin/firefox --no-remote --new-instance
+StartupNotify=true
+Terminal=false
+Icon=firefox
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;application/x-xpinstall;
+Actions=new-window;new-private-window;
+X-XFCE-Source=file:///usr/share/applications/firefox.desktop
+
+[Desktop Action new-window]
+Name=Open a New Window
+Exec=/usr/bin/firefox --no-remote --new-instance --new-window
+
+[Desktop Action new-private-window]
+Name=Open a New Private Window
+Exec=/usr/bin/firefox --no-remote --new-instance --private-window
+

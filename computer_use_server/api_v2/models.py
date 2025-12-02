@@ -6,3 +6,6 @@ class Coordinates(BaseModel):
     y: int
 
 
+class TextInput(BaseModel):
+    text: str
+

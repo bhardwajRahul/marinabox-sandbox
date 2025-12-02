@@ -1,6 +1,6 @@
 FROM alpine:3.19
 
-# Install required packages
+# Install required packages (matching desktop version + browser essentials)
 RUN apk add --no-cache \
     xvfb \
     x11vnc \
@@ -13,17 +13,22 @@ RUN apk add --no-cache \
     imagemagick \
     python3 \
     py3-pip \
-    xfce4 \
-    xfce4-terminal \
     dbus \
     dbus-x11 \
     python3-dev \
     py3-virtualenv \
-    xdotool
+    xdotool \
+    mesa-dri-gallium \
+    vulkan-loader \
+    mesa \
+    mesa-gl \
+    mesa-egl \
+    mesa-gles
 
 # Initialize dbus machine-id and create necessary directories
 RUN mkdir -p /var/run/dbus && \
-    dbus-uuidgen > /var/lib/dbus/machine-id
+    dbus-uuidgen > /var/lib/dbus/machine-id && \
+    mkdir -p /var/log
 
 # Create and activate virtual environment
 ENV VIRTUAL_ENV=/opt/venv
@@ -36,10 +41,7 @@ RUN pip3 install --no-cache-dir \
     uvicorn \
     python-multipart
 
-# Modify Firefox desktop entry to use appropriate flags
-RUN sed -i 's|^Exec=.*|Exec=/usr/bin/firefox --no-remote --new-instance|' /usr/share/applications/firefox.desktop || true
-
-# Configure Firefox to skip first-run pages
+# Configure Firefox to skip first-run pages and run in kiosk mode
 RUN mkdir -p /root/.mozilla/firefox && \
     echo '[General]' > /root/.mozilla/firefox/profiles.ini && \
     echo 'StartWithLastProfile=1' >> /root/.mozilla/firefox/profiles.ini && \
@@ -55,7 +57,11 @@ RUN mkdir -p /root/.mozilla/firefox && \
     echo 'user_pref("startup.homepage_welcome_url.additional", "");' >> /root/.mozilla/firefox/default.default/user.js && \
     echo 'user_pref("browser.aboutwelcome.enabled", false);' >> /root/.mozilla/firefox/default.default/user.js && \
     echo 'user_pref("trailhead.firstrun.didSeeAboutWelcome", true);' >> /root/.mozilla/firefox/default.default/user.js && \
-    echo 'user_pref("browser.startup.firstrunSkipsHomepage", false);' >> /root/.mozilla/firefox/default.default/user.js
+    echo 'user_pref("browser.startup.firstrunSkipsHomepage", false);' >> /root/.mozilla/firefox/default.default/user.js && \
+    echo 'user_pref("browser.shell.checkDefaultBrowser", false);' >> /root/.mozilla/firefox/default.default/user.js && \
+    echo 'user_pref("browser.tabs.warnOnClose", false);' >> /root/.mozilla/firefox/default.default/user.js && \
+    echo 'user_pref("browser.sessionstore.resume_from_crash", false);' >> /root/.mozilla/firefox/default.default/user.js && \
+    echo 'user_pref("toolkit.startup.max_resumed_crashes", -1);' >> /root/.mozilla/firefox/default.default/user.js
 
 # Create supervisor config directory
 RUN mkdir -p /etc/supervisor.d
@@ -64,9 +70,7 @@ COPY noVNC /usr/share/novnc
 # index.html redirects to vnc.html with autoconnect and resize parameters
 
 # Copy supervisor config
-COPY desktop-supervisord.conf /etc/supervisor.d/supervisord.ini
-
-COPY desktop_files /root/desktop_files
+COPY firefox-supervisord.conf /etc/supervisor.d/supervisord.ini
 
 # Add computer_use_server directory
 COPY computer_use_server /computer_use_server
@@ -79,3 +83,4 @@ RUN chmod +x /start.sh
 EXPOSE 5900 6081 8000 2000
 
 CMD ["/start.sh"]
+

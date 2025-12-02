@@ -120,14 +120,12 @@ const UI = {
 
         document.documentElement.classList.remove("noVNC_loading");
 
-        let autoconnect = true;
-        
+        let autoconnect = WebUtil.getConfigVar('autoconnect');
         if (autoconnect === 'true' || autoconnect == '1') {
             autoconnect = true;
             UI.connect();
         } else {
             autoconnect = false;
-            // Show the connect panel on first load unless autoconnecting
             UI.openConnectPanel();
         }
 
