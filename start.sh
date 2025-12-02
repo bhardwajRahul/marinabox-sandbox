@@ -17,11 +17,9 @@ sed -i "s|FFMPEG_PLACEHOLDER|$FFMPEG_RESOLUTION|g" /etc/supervisor.d/supervisord
 sed -i "s|WIDTH_PLACEHOLDER|$WIDTH|g" /etc/supervisor.d/supervisord.ini
 sed -i "s|HEIGHT_PLACEHOLDER|$HEIGHT|g" /etc/supervisor.d/supervisord.ini
 
-# Initialize dbus if not already running
-if [ ! -e /var/run/dbus/system_bus_socket ]; then
-    mkdir -p /var/run/dbus
-    dbus-daemon --system --fork
-fi
+# Ensure XFCE default browser points to Firefox to avoid 'default web browser' I/O errors
+mkdir -p /root/.config/xfce4
+printf "[Helpers]\nWebBrowser=firefox\n" > /root/.config/xfce4/helpers.rc
 
 # Start supervisord
 exec /usr/bin/supervisord -n -c /etc/supervisor.d/supervisord.ini
